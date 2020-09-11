@@ -17,18 +17,10 @@ variables:
 steps:
 - task: NuGetToolInstaller@1
 
-- task: DotNetCoreCLI@2
-  displayName: Restore
+- task: UseDotNet@2
   inputs:
-    command: restore
-    projects: '**/*.csproj'
-    nugetConfigPath: NuGet.config    # Relative to root of the repository
-
-- task: DotNetCoreCLI@2
-  displayName: Build
-  inputs:
-    command: build
-    projects: '**/*.csproj'
+    packageType: 'sdk'
+    version: '3.x'
 
 - task: DotNetCoreCLI@2
   inputs:
@@ -41,4 +33,5 @@ steps:
 - task: PublishBuildArtifacts@1
   inputs:
     pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
-    artifactName: 'myWebsiteName'
+    artifactName: 'Support_API'
+    publishLocation: 'Container'

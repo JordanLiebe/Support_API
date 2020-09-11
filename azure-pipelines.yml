@@ -26,3 +26,8 @@ steps:
     command: 'build'
     projects: '**/*.csprog'
 
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: true
+    zipAfterPublish: false

@@ -27,7 +27,7 @@ namespace Support_API.Data
 
                 var questionDictionary = new Dictionary<int, Issue>();
 
-                return connection.Query<Issue>("EXEC [Support].[dbo].[SP_Get_Issues]").ToList();
+                return connection.Query<Issue>("EXEC [dbo].[SP_Get_Issues]").ToList();
             }
         }
     }

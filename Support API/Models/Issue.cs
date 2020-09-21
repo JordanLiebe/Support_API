@@ -19,6 +19,7 @@ namespace Support_API.Models
         public string Department { get; set; }
         [MaxLength(150)]
         public string Author { get; set; }
+        public List<Note> Notes { get; set; }
         [MaxLength(100)]
         public string Status { get; set; }
         public DateTime Created { get; set; }

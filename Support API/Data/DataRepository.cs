@@ -25,9 +25,29 @@ namespace Support_API.Data
             {
                 connection.Open();
 
-                var questionDictionary = new Dictionary<int, Issue>();
+                var issueDictionary = new Dictionary<int, Issue>();
 
-                return connection.Query<Issue>("EXEC [dbo].[SP_Get_Issues]").ToList();
+                return connection
+                    .Query<Issue, Note, Issue>(
+                        "EXEC [dbo].[SP_Get_Issues]",
+                        map: (I, N) =>
+                        {
+                            Issue issue;
+
+                            if (!issueDictionary.TryGetValue(I.Id, out issue))
+                            {
+                                issue = I;
+                                issue.Notes =
+                                    new List<Note>();
+                                issueDictionary.Add(issue.Id, issue);
+                            }
+
+                            issue.Notes.Add(N);
+                            return issue;
+                        },
+                        splitOn: "Id")
+                    .Distinct()
+                    .ToList();
             }
         }
     }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Support_API.Models
 {
-    public class Note
+    public class NoteGetResponse
     {
         public int Id { get; set; }
         public int IssueId { get; set; }

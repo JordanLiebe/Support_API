@@ -11,20 +11,19 @@ namespace Support_API.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class IssueController : ControllerBase
+    public class NoteController : ControllerBase
     {
         public readonly IDataRepository myDataRepository;
-        public IssueController(IDataRepository dataRepository)
+        public NoteController(IDataRepository dataRepository)
         {
             myDataRepository = dataRepository;
         }
 
-        [HttpGet]
-        public IActionResult Index()
+        [HttpGet("{IssueId}")]
+        public IActionResult GetNotes(int IssueId)
         {
-            List<IssueGetResponse> Data = myDataRepository.GetIssuesAndNotes();
-
-            return Ok(Data);
+            List<NoteGetResponse> Notes = myDataRepository.GetNotes(IssueId);
+            return Ok(Notes);
         }
     }
 }

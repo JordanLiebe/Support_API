@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Support_API.Models
 {
-    public class Issue
+    public class IssueGetResponse
     {
         public int Id { get; set; }
         [MaxLength(300)]
@@ -19,7 +19,7 @@ namespace Support_API.Models
         public string Department { get; set; }
         [MaxLength(150)]
         public string Author { get; set; }
-        public List<Note> Notes { get; set; }
+        public List<NoteGetResponse> Notes { get; set; }
         [MaxLength(100)]
         public string Status { get; set; }
         public DateTime Created { get; set; }

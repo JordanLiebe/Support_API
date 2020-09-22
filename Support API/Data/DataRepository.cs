@@ -19,26 +19,26 @@ namespace Support_API.Data
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        public List<Issue> GetIssues()
+        public List<IssueGetResponse> GetIssuesAndNotes()
         {
             using(var connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
 
-                var issueDictionary = new Dictionary<int, Issue>();
+                var issueDictionary = new Dictionary<int, IssueGetResponse>();
 
                 return connection
-                    .Query<Issue, Note, Issue>(
-                        "EXEC [dbo].[SP_Get_Issues]",
+                    .Query<IssueGetResponse, NoteGetResponse, IssueGetResponse>(
+                        "EXEC [dbo].[SP_Get_Issues_And_Notes]",
                         map: (I, N) =>
                         {
-                            Issue issue;
+                            IssueGetResponse issue;
 
                             if (!issueDictionary.TryGetValue(I.Id, out issue))
                             {
                                 issue = I;
                                 issue.Notes =
-                                    new List<Note>();
+                                    new List<NoteGetResponse>();
                                 issueDictionary.Add(issue.Id, issue);
                             }
 
@@ -46,6 +46,22 @@ namespace Support_API.Data
                             return issue;
                         },
                         splitOn: "Id")
+                    .Distinct()
+                    .ToList();
+            }
+        }
+
+        public List<NoteGetResponse> GetNotes(int IssueId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+
+                var noteDictionary = new Dictionary<int, NoteGetResponse>();
+
+                return connection
+                    .Query<NoteGetResponse>(
+                        "EXEC [dbo].[SP_Get_Notes] @IssueId = @IssueId", new { IssueId = IssueId })
                     .Distinct()
                     .ToList();
             }

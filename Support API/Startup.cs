@@ -27,6 +27,16 @@ namespace Support_API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("JmliebeCors", builder =>
+                {
+                    builder.AllowCredentials();
+                    builder.AllowAnyMethod();
+                    builder.WithOrigins("http://localhost:3000", "https://jmliebe-support.azurewebsites.net");
+                });
+            });
+
             services.AddSwaggerGen();
 
             services.AddControllers();
@@ -37,6 +47,8 @@ namespace Support_API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseCors("JmliebeCors");
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

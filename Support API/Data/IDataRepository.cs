@@ -8,7 +8,7 @@ namespace Support_API.Data
 {
     public interface IDataRepository
     {
-        public List<IssueGetResponse> GetIssuesAndNotes();
+        public List<IssueGetResponse> GetIssuesAndNotes(IssueGetFilters? Filters);
         public List<NoteGetResponse> GetNotes(int IssueId);
     }
 }

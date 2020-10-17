@@ -10,5 +10,6 @@ namespace Support_API.Data
     {
         public List<IssueGetResponse> GetIssuesAndNotes(IssueGetFilters? Filters);
         public List<NoteGetResponse> GetNotes(int IssueId);
+        public IssueGetResponse CreateIssue(IssuePostRequest Issue);
     }
 }

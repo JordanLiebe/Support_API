@@ -20,11 +20,19 @@ namespace Support_API.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index([FromQuery]IssueGetFilters? Filters)
+        public IActionResult GetIssues([FromQuery]IssueGetFilters? Filters)
         {
             List<IssueGetResponse> Data = myDataRepository.GetIssuesAndNotes(Filters);
 
             return Ok(Data);
+        }
+
+        [HttpPost]
+        public IActionResult CreateIssue(IssuePostRequest Issue)
+        {
+            IssueGetResponse CreatedIssue = myDataRepository.CreateIssue(Issue);
+
+            return Ok(CreatedIssue);
         }
     }
 }

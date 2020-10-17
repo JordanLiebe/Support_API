@@ -19,6 +19,20 @@ namespace Support_API.Data
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
+        public IssueGetResponse CreateIssue(IssuePostRequest Issue)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+
+                return connection
+                    .Query<IssueGetResponse>(
+                        "EXEC [Support-API].[dbo].[SP_Create_Issue] @Subject = @Subject, @Priority = @Priority, @Category = @Category, @Department = @Department, @Initial_Note = @Initial_Note, @Author = @Author, @Status = @Status",
+                        new { Subject = Issue.Subject, Priority = Issue.Priority, Category = Issue.Category, Department = Issue.Department, Initial_Note = Issue.Initial_Note, Author = Issue.Author, Status = Issue.Status }
+                    ).FirstOrDefault();
+            }
+        }
+
         public List<IssueGetResponse> GetIssuesAndNotes(IssueGetFilters? Filters)
         {
             using(var connection = new SqlConnection(_connectionString))

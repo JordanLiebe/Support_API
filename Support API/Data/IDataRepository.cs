@@ -8,8 +8,18 @@ namespace Support_API.Data
 {
     public interface IDataRepository
     {
-        public List<IssueGetResponse> GetIssuesAndNotes(IssueGetFilters? Filters);
-        public List<NoteGetResponse> GetNotes(int IssueId);
-        public IssueGetResponse CreateIssue(IssuePostRequest Issue);
+        // Issue Related Functions //
+        public List<IssueGetResponse> GetIssuesAndNotes(IssueGetFilters? Filters);//SP_Get_Issues_And_Notes_Filter
+        public IssueGetResponse CreateIssue(IssuePostRequest Issue);//SP_Create_Issue
+        public IssueGetResponse GetIssue(int Id);//SP_Get_Issue
+        public IssueGetResponse UpdateIssue(IssuePostRequest Issue);//SP_Update_Issue
+        public bool DeleteIssue(int Id);//SP_Delete_Issue
+
+        // Note Related Functions //
+        public List<NoteGetResponse> GetNotes();//SP_Get_Notes
+        public NoteGetResponse CreateNote(NotePostRequest Note);//SP
+        public NoteGetResponse GetNote(int Id);//
+        public NoteGetResponse UpdateNote(NotePostRequest Note);//
+        public bool DeleteNote(int Id);//
     }
 }

@@ -19,35 +19,49 @@ namespace Support_API.Controllers
             myDataRepository = dataRepository;
         }
 
-        [HttpGet("{IssueId}")]
+        [HttpGet]
         public IActionResult GetNotes()
         {
-            List<NoteGetResponse> Notes = myDataRepository.GetNotes();
-            return Ok(Notes);
+            List<NoteGetResponse> notes = myDataRepository.GetNotes();
+            return Ok(notes);
+        }
+
+        [HttpGet("{Id}")]
+        public IActionResult GetNotes(int Id)
+        {
+            NoteGetResponse note = myDataRepository.GetNote(Id);
+
+            if (note != null)
+                return Ok(note);
+            else
+                return NotFound();
         }
 
         [HttpPost]
         public IActionResult CreateNote(NotePostRequest note)
         {
-            NoteGetResponse response = myDataRepository.CreateNote(note);
+            NoteGetResponse newNote = myDataRepository.CreateNote(note);
 
-            return Ok(Response);
+            return Ok(newNote);
         }
 
         [HttpPut("{Id}")]
         public IActionResult UpdateNote(int Id, [FromBody]NotePostRequest note)
         {
+            NoteGetResponse updatedNote = myDataRepository.UpdateNote(Id, note);
 
-
-            return NotFound();
+            if (updatedNote != null)
+                return Ok(updatedNote);
+            else
+                return NotFound();
         }
 
         [HttpDelete("{Id}")]
         public IActionResult DeleteNote(int Id)
         {
-            bool Success = myDataRepository.DeleteNote(Id);
+            bool success = myDataRepository.DeleteNote(Id);
 
-            return Ok(Success);
+            return Ok(new { Id = Id, Success = success });
         }
     }
 }

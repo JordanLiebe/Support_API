@@ -21,79 +21,7 @@ namespace Support_API.Data
         }
 
         // Issue Related Functions //
-        public List<IssueGetResponse> GetIssuesAndNotes(IssueGetFilters? Filters)
-        {
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                connection.Open();
-
-                var issueDictionary = new Dictionary<int, IssueGetResponse>();
-
-                if (Filters is null)
-                {
-                    return connection
-                    .Query<IssueGetResponse, NoteGetResponse, IssueGetResponse>(
-                        "EXEC [dbo].[SP_Get_Issues_And_Notes]",
-                        map: (I, N) =>
-                        {
-                            IssueGetResponse issue;
-
-                            if (!issueDictionary.TryGetValue(I.Id, out issue))
-                            {
-                                issue = I;
-                                issue.Notes =
-                                    new List<NoteGetResponse>();
-                                issueDictionary.Add(issue.Id, issue);
-                            }
-
-                            issue.Notes.Add(N);
-                            return issue;
-                        },
-                        splitOn: "Id")
-                    .Distinct()
-                    .ToList();
-                }
-                else
-                {
-                    return connection
-                    .Query<IssueGetResponse, NoteGetResponse, IssueGetResponse>(
-                        "EXEC [dbo].[SP_Get_Issues_And_Notes_Filtered] @Id = @Id, @Subject = @Subject, @Priority = @Priority, @Category = @Category, @Department = @Department, @Status = @Status, @Author = @Author, @Assignee = @Assignee",
-                        map: (I, N) =>
-                        {
-                            IssueGetResponse issue;
-
-                            if (!issueDictionary.TryGetValue(I.Id, out issue))
-                            {
-                                issue = I;
-                                issue.Notes =
-                                    new List<NoteGetResponse>();
-                                issueDictionary.Add(issue.Id, issue);
-                            }
-
-                            issue.Notes.Add(N);
-                            return issue;
-                        },
-                        param: new { Id = Filters.Id, Subject = Filters.Subject, Priority = Filters.Priority, Category = Filters.Category, Department = Filters.Department, Status = Filters.Status, Author = Filters.Author, Assignee = Filters.Assignee },
-                        splitOn: "Id")
-                    .Distinct()
-                    .ToList();
-                }
-            }
-        }
-        public IssueGetResponse CreateIssue(IssuePostRequest Issue)
-        {
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                connection.Open();
-
-                return connection
-                    .Query<IssueGetResponse>(
-                        "EXEC [Support-API].[dbo].[SP_Create_Issue] @Subject = @Subject, @Priority = @Priority, @Category = @Category, @Department = @Department, @Initial_Note = @Initial_Note, @Author = @Author, @Status = @Status",
-                        new { Subject = Issue.Subject, Priority = Issue.Priority, Category = Issue.Category, Department = Issue.Department, Initial_Note = Issue.Initial_Note, Author = Issue.Author, Status = Issue.Status }
-                    ).FirstOrDefault();
-            }
-        }
-        public IssueGetResponse GetIssue(int IssueId)
+        public List<IssueGetResponse> GetIssues(IssueGetFilters Filters)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -103,7 +31,7 @@ namespace Support_API.Data
 
                 return connection
                 .Query<IssueGetResponse, NoteGetResponse, IssueGetResponse>(
-                    "EXEC [dbo].[SP_Get_Issue] @IssueId = @IssueId",
+                    "EXEC [dbo].[SP_Get_Issues_Filtered] @Id = @Id, @Subject = @Subject, @Priority = @Priority, @Category = @Category, @Department = @Department, @Status = @Status, @Author = @Author, @Assignee = @Assignee",
                     map: (I, N) =>
                     {
                         IssueGetResponse issue;
@@ -119,13 +47,13 @@ namespace Support_API.Data
                         issue.Notes.Add(N);
                         return issue;
                     },
-                    param: new { IssueId = IssueId },
+                    param: new { Id = Filters.Id, Subject = Filters.Subject, Priority = Filters.Priority, Category = Filters.Category, Department = Filters.Department, Status = Filters.Status, Author = Filters.Author, Assignee = Filters.Assignee },
                     splitOn: "Id")
                 .Distinct()
-                .FirstOrDefault();
+                .ToList();
             }
         }
-        public IssueGetResponse UpdateIssue(IssuePostRequest Issue)
+        public IssueGetResponse CreateIssue(IssuePostRequest Issue)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -135,6 +63,51 @@ namespace Support_API.Data
                     .Query<IssueGetResponse>(
                         "EXEC [Support-API].[dbo].[SP_Create_Issue] @Subject = @Subject, @Priority = @Priority, @Category = @Category, @Department = @Department, @Initial_Note = @Initial_Note, @Author = @Author, @Status = @Status",
                         new { Subject = Issue.Subject, Priority = Issue.Priority, Category = Issue.Category, Department = Issue.Department, Initial_Note = Issue.Initial_Note, Author = Issue.Author, Status = Issue.Status }
+                    ).FirstOrDefault();
+            }
+        }
+        public IssueGetResponse GetIssue(int Id)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+
+                var issueDictionary = new Dictionary<int, IssueGetResponse>();
+
+                return connection
+                .Query<IssueGetResponse, NoteGetResponse, IssueGetResponse>(
+                    "EXEC [dbo].[SP_Get_Issue] @Id = @Id",
+                    map: (I, N) =>
+                    {
+                        IssueGetResponse issue;
+
+                        if (!issueDictionary.TryGetValue(I.Id, out issue))
+                        {
+                            issue = I;
+                            issue.Notes =
+                                new List<NoteGetResponse>();
+                            issueDictionary.Add(issue.Id, issue);
+                        }
+
+                        issue.Notes.Add(N);
+                        return issue;
+                    },
+                    param: new { Id = Id },
+                    splitOn: "Id")
+                .Distinct()
+                .FirstOrDefault();
+            }
+        }
+        public IssueGetResponse UpdateIssue(int Id, IssuePostRequest Issue)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+
+                return connection
+                    .Query<IssueGetResponse>(
+                        "EXEC [Support-API].[dbo].[SP_Update_Issue] @Id = @Id, @Subject = @Subject, @Priority = @Priority, @Category = @Category, @Department = @Department, @Author = @Author, @Status = @Status",
+                        new { Id = Id, Subject = Issue.Subject, Priority = Issue.Priority, Category = Issue.Category, Department = Issue.Department, Author = Issue.Author, Status = Issue.Status }
                     ).FirstOrDefault();
             }
         }
@@ -154,6 +127,19 @@ namespace Support_API.Data
                 return deleted.Success == 1 ? true : false;
             }
         }
+        public List<NoteGetResponse> GetIssueNotes(int IssueId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+
+                return connection
+                    .Query<NoteGetResponse>(
+                        "EXEC [dbo].[SP_Get_Issue_Notes] @IssueId = @IssueId", new { IssueId = IssueId })
+                    .Distinct()
+                    .ToList();
+            }
+        }
 
         // Note Related Functions //
         public List<NoteGetResponse> GetNotes()
@@ -162,11 +148,9 @@ namespace Support_API.Data
             {
                 connection.Open();
 
-                var noteDictionary = new Dictionary<int, NoteGetResponse>();
-
                 return connection
                     .Query<NoteGetResponse>(
-                        "EXEC [dbo].[SP_Get_Notes] @IssueId = @IssueId")
+                        "EXEC [dbo].[SP_Get_Notes]")
                     .Distinct()
                     .ToList();
             }
@@ -176,7 +160,7 @@ namespace Support_API.Data
             using (var connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
-
+                 
                 return connection
                     .Query<NoteGetResponse>(
                         "EXEC [Support-API].[dbo].[SP_Create_Note] @IssueId = @IssueId, @Content = @Content, @Flag = @Flag, @Author = @Author",
@@ -192,14 +176,23 @@ namespace Support_API.Data
 
                 return connection
                     .Query<NoteGetResponse>(
-                        "EXEC [dbo].[SP_Get_Note] @Id = @Id")
+                        "EXEC [dbo].[SP_Get_Note] @Id = @Id", new { Id = Id })
                     .Distinct()
                     .FirstOrDefault();
             }
         }
-        public NoteGetResponse UpdateNote(NotePostRequest Note)
+        public NoteGetResponse UpdateNote(int Id, NotePostRequest Note)
         {
-            throw new NotImplementedException();
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+
+                return connection
+                    .Query<NoteGetResponse>(
+                        "EXEC [dbo].[SP_Update_Note] @Id = @Id, @IssueId = @IssueId, @Content = @Content, @Flag = @Flag, @Author = @Author", new { Id = Id, IssueId = Note.IssueId, Content = Note.Content, Flag = Note.Flag, Author = Note.Author })
+                    .Distinct()
+                    .FirstOrDefault();
+            }
         }
         public bool DeleteNote(int Id)
         {

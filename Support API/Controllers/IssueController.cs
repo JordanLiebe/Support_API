@@ -22,7 +22,7 @@ namespace Support_API.Controllers
         [HttpGet]
         public IActionResult GetIssues([FromQuery]IssueGetFilters Filters)
         {
-            List<IssueGetResponse> Data = myDataRepository.GetIssuesAndNotes(Filters);
+            List<IssueGetResponse> Data = myDataRepository.GetIssues(Filters);
 
             return Ok(Data);
         }
@@ -36,17 +36,14 @@ namespace Support_API.Controllers
         }
 
         [HttpPut("{Id}")]
-        public IActionResult PutIssue(int Id)
+        public IActionResult UpdateIssue(int Id, [FromBody]IssuePostRequest Issue)
         {
-            return Ok();
-        }
+            IssueGetResponse updatedIssue = myDataRepository.UpdateIssue(Id, Issue);
 
-        [HttpGet("{Id}/Notes")]
-        public IActionResult GetIssueNotes(int Id)
-        {
-            List<IssueGetResponse> Data;
-
-            return Ok(0);
+            if (updatedIssue != null)
+                return Ok(updatedIssue);
+            else
+                return NotFound();
         }
 
         [HttpPost]
@@ -63,6 +60,14 @@ namespace Support_API.Controllers
             bool deleted = myDataRepository.DeleteIssue(Id);
 
             return Ok(deleted ? true : false);
-         }
+        }
+
+        [HttpGet("{IssueId}/Notes")]
+        public IActionResult GetIssueNotes(int IssueId)
+        {
+            List<NoteGetResponse> response = myDataRepository.GetIssueNotes(IssueId);
+
+            return Ok(response);
+        }
     }
 }

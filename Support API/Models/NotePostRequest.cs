@@ -9,7 +9,7 @@ namespace Support_API.Models
     {
         public int IssueId { get; set; }
         public string Content { get; set; }
-        public string Flag { get; set; }
+        public bool Flag { get; set; }
         public string Author { get; set; }
     }
 }

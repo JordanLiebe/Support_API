@@ -1,0 +1,65 @@
+﻿using Microsoft.AspNetCore.Http;
+using Support_API.Data;
+using Support_API.Models.Auth;
+using Support_API.Tools;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace Support_API.Middleware
+{
+    public class AuthenticationMiddleware
+    {
+        private readonly RequestDelegate _next;
+
+        public AuthenticationMiddleware(RequestDelegate next)
+        {
+            _next = next;
+        }
+
+        public async Task InvokeAsync(HttpContext context, IUserManager _userManager)
+        {
+            IHeaderDictionary headers = context.Request.Headers;
+            string[] Unlocked = { "/Auth/Login" };
+
+            string authHeader = headers["Authorization"];
+            string path = context.Request.Path;
+
+            if (Unlocked.Where(e => e == path).FirstOrDefault() == null)
+            {
+                if (authHeader != null && authHeader != string.Empty)
+                {
+                    string[] tokenBreak = authHeader.Split(" ");
+
+                    if (tokenBreak.Length == 2)
+                    {
+                        string AuthToken = tokenBreak[1];
+                        string UUID = JWT.ValidateJwtToken(AuthToken);
+
+                        if(UUID != null)
+                        {
+                            User user = _userManager.GetUser(UUID);
+
+                            if(user != null)
+                            {
+                                Session latestSession = _userManager.GetLatestSession(UUID);
+
+                                if(latestSession.JWT == AuthToken && latestSession.UUID == UUID)
+                                {
+                                    await _next(context);
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                context.Response.StatusCode = 401;
+                return;
+            }
+
+            await _next(context);
+        }
+    }
+}

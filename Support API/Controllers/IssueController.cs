@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 
 namespace Support_API.Controllers
 {
-    [Authorize]
     [Route("[controller]")]
     [ApiController]
     public class IssueController : ControllerBase

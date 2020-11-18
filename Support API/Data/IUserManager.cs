@@ -9,14 +9,12 @@ namespace Support_API.Data
 {
     public interface IUserManager
     {
+        // Storage for Currently Logged In User //
         public User CurrentUser { get; set; }
-        // User Management Functions //
-        public User CreateUser(string firstName, string middleName, string lastName, string login, string password);
-        public string AuthenticateUser(string login, string password);
-        public User GetUser(string uuid);
 
-        // Session Management Functions //
-        public Session CreateSession(User user, string JWT);
-        public Session GetLatestSession(string UUID);
+        // User Management Functions //
+        public CreateUserResponse CreateUser(string firstName, string middleName, string lastName, string login, string password);
+        public AuthUserResponse AuthenticateUser(string login, string password);
+        public User GetUser(string uuid);
     }
 }

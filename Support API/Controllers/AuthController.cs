@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Support_API.Data;
+using Support_API.Models.Auth;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,29 +23,25 @@ namespace Support_API.Controllers
         [HttpGet("Test")]
         public IActionResult GetTest()
         {
-            return Ok("Hello World!");
+            User user = new User(myUserManager.CurrentUser, false);
+
+            return Ok(user);
         }
 
         [HttpPost("Create")]
-        public IActionResult CreateUser(string First_Name, string? Middle_Name, string Last_Name, string Login, string Password)
+        public IActionResult CreateUser(string First_Name, string Middle_Name, string Last_Name, string Login, string Password)
         {
-            var user = myUserManager.CreateUser(First_Name, Middle_Name, Last_Name, Login, Password);
+            CreateUserResponse crResponse = myUserManager.CreateUser(First_Name, Middle_Name, Last_Name, Login, Password);
 
-            if (user != null)
-                return Ok(user);
-            else
-                return NoContent();
+            return Ok(crResponse);
         }
 
         [HttpPost("Login")]
         public IActionResult LoginUser(string Login, string Password)
         {
-            var token = myUserManager.AuthenticateUser(Login, Password);
+            AuthUserResponse authResponse = myUserManager.AuthenticateUser(Login, Password);
 
-            if (token != null)
-                return Ok(new { Login = Login, Success = true, JWT = token });
-            else
-                return NoContent();
+            return Ok(authResponse);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Support_API.Data;
 using Support_API.Models.Auth;
 using Support_API.Tools;
@@ -9,6 +10,14 @@ using System.Threading.Tasks;
 
 namespace Support_API.Middleware
 {
+    public static class AuthenticationMiddlewareExtension
+    {
+        public static IApplicationBuilder UseAuthenticationMiddleware(this IApplicationBuilder builder)
+        {
+            return builder.UseMiddleware<AuthenticationMiddleware>();
+        }
+    }
+
     public class AuthenticationMiddleware
     {
         private readonly RequestDelegate _next;
@@ -18,7 +27,7 @@ namespace Support_API.Middleware
             _next = next;
         }
 
-        public async Task InvokeAsync(HttpContext context, IUserManager _userManager)
+        public async Task InvokeAsync(HttpContext context, IUserManager _userManager, ISessionManager _sessionManager)
         {
             IHeaderDictionary headers = context.Request.Headers;
             string[] Unlocked = { "/Auth/Login" };
@@ -43,10 +52,11 @@ namespace Support_API.Middleware
 
                             if(user != null)
                             {
-                                Session latestSession = _userManager.GetLatestSession(UUID);
+                                Session latestSession = _sessionManager.GetLatestSession(UUID);
 
                                 if(latestSession.JWT == AuthToken && latestSession.UUID == UUID)
                                 {
+                                    _userManager.CurrentUser = user;
                                     await _next(context);
                                     return;
                                 }

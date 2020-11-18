@@ -14,7 +14,7 @@ using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Support_API.Data;
 using Microsoft.AspNetCore.Http;
-using Support_API.Extensions;
+using Support_API.Middleware;
 
 namespace Support_API
 {
@@ -47,6 +47,8 @@ namespace Support_API
             services.AddScoped<IDataRepository, DataRepository>();
 
             services.AddScoped<IUserManager, UserManager>();
+
+            services.AddScoped<ISessionManager, SessionManager>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -26,6 +26,7 @@ namespace Support_API.Tools
             return tokenHandler.WriteToken(token);
         }
 
+        #nullable enable
         public static string? ValidateJwtToken(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();

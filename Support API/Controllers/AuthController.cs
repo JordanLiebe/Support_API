@@ -37,9 +37,9 @@ namespace Support_API.Controllers
         }
 
         [HttpPost("Login")]
-        public IActionResult LoginUser(string Login, string Password)
+        public IActionResult LoginUser([FromBody]LoginPost login)
         {
-            AuthUserResponse authResponse = myUserManager.AuthenticateUser(Login, Password);
+            AuthUserResponse authResponse = myUserManager.AuthenticateUser(login.Username, login.Password);
 
             return Ok(authResponse);
         }

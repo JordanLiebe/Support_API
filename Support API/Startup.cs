@@ -37,7 +37,7 @@ namespace Support_API
                     builder.AllowCredentials();
                     builder.AllowAnyMethod();
                     builder.AllowAnyHeader();
-                    builder.WithOrigins("http://localhost:3000", "https://jmliebe-support.azurewebsites.net", "http://jmlieb.comt");
+                    builder.WithOrigins("https://support.jmliebe.com", "http://localhost:3000");
                 });
             });
 

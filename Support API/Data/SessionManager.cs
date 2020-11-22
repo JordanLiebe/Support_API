@@ -20,7 +20,7 @@ namespace Support_API.Data
             _connectionString = _configuration.GetConnectionString("DefaultConnection");
         }
 
-        public Session CreateSession(User user, string JWT)
+        public Session CreateSession(User user, string JWT, string Code)
         {
             Session session = null;
 
@@ -30,8 +30,8 @@ namespace Support_API.Data
 
                 session = connection
                     .Query<Session>(
-                        "EXEC [Support-API].[dbo].[SP_Create_Session] @UUID = @UUID, @JWT = @JWT",
-                        new { UUID = user.UUID, JWT = JWT }
+                        "EXEC [Support-API].[dbo].[SP_Create_Session] @UUID = @UUID, @JWT = @JWT, @CODE = @CODE",
+                        new { UUID = user.UUID, JWT = JWT, CODE = Code }
                     ).FirstOrDefault();
             }
 

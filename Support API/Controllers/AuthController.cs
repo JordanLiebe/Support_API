@@ -20,8 +20,8 @@ namespace Support_API.Controllers
             myUserManager = userManager;
         }
 
-        [HttpGet("Test")]
-        public IActionResult GetTest()
+        [HttpGet("Me")]
+        public IActionResult GetMe()
         {
             User user = new User(myUserManager.CurrentUser, false);
 
@@ -42,6 +42,12 @@ namespace Support_API.Controllers
             AuthUserResponse authResponse = myUserManager.AuthenticateUser(login.Username, login.Password);
 
             return Ok(authResponse);
+        }
+
+        [HttpPost("Code")]
+        public IActionResult VerifyCode(int Code, string Token)
+        {
+            return Ok();
         }
     }
 }

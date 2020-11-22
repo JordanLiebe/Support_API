@@ -92,7 +92,10 @@ namespace Support_API.Data
             {
                 var token = JWT.GenerateToken(user.UUID, user.Login);
 
-                Session session = _sessionManager.CreateSession(user, token);
+                int code = NumberGen.Random(111111, 999999);
+                string hashedCode = Hashing.GenerateHash(code.ToString());
+
+                Session session = _sessionManager.CreateSession(user, token, hashedCode);
 
                 if(token == null || session == null)
                 {

@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
 using Support_API.Models.Auth;
+using Support_API.Tools;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -32,6 +33,27 @@ namespace Support_API.Data
                     .Query<Session>(
                         "EXEC [Support-API].[dbo].[SP_Create_Session] @UUID = @UUID, @JWT = @JWT, @CODE = @CODE",
                         new { UUID = user.UUID, JWT = JWT, CODE = Code }
+                    ).FirstOrDefault();
+            }
+
+            return session;
+        }
+
+        public Session VerifySession(string JWT, int Code)
+        {
+            Session session = null;
+
+            string CodeStr = Code.ToString();
+            string HashedCodeStr = Hashing.GenerateHash(CodeStr);
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+
+                session = connection
+                    .Query<Session>(
+                        "EXEC [Support-API].[dbo].[SP_Verify_Session] @JWT = @JWT, @CODE = @CODE",
+                        new { JWT = JWT, CODE = HashedCodeStr }
                     ).FirstOrDefault();
             }
 

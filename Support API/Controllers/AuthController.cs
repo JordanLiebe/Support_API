@@ -14,16 +14,18 @@ namespace Support_API.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        public readonly IUserManager myUserManager;
-        public AuthController(IUserManager userManager)
+        private readonly IUserManager _userManager;
+        private readonly ISessionManager _sessionManager;
+        public AuthController(IUserManager userManager, ISessionManager sessionManager)
         {
-            myUserManager = userManager;
+            _userManager = userManager;
+            _sessionManager = sessionManager;
         }
 
         [HttpGet("Me")]
         public IActionResult GetMe()
         {
-            User user = new User(myUserManager.CurrentUser, false);
+            User user = new User(_userManager.CurrentUser, false);
 
             return Ok(user);
         }
@@ -31,7 +33,7 @@ namespace Support_API.Controllers
         [HttpPost("Create")]
         public IActionResult CreateUser(string First_Name, string Middle_Name, string Last_Name, string Login, string Password)
         {
-            CreateUserResponse crResponse = myUserManager.CreateUser(First_Name, Middle_Name, Last_Name, Login, Password);
+            CreateUserResponse crResponse = _userManager.CreateUser(First_Name, Middle_Name, Last_Name, Login, Password);
 
             return Ok(crResponse);
         }
@@ -39,7 +41,7 @@ namespace Support_API.Controllers
         [HttpPost("Login")]
         public IActionResult LoginUser([FromBody]LoginPost login)
         {
-            AuthUserResponse authResponse = myUserManager.AuthenticateUser(login.Username, login.Password);
+            AuthUserResponse authResponse = _userManager.AuthenticateUser(login.Username, login.Password);
 
             return Ok(authResponse);
         }
@@ -47,6 +49,8 @@ namespace Support_API.Controllers
         [HttpPost("Code")]
         public IActionResult VerifyCode(int Code, string Token)
         {
+            Session session = _sessionManager.VerifySession(Token, Code);
+
             return Ok();
         }
     }

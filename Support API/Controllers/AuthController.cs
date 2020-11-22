@@ -49,9 +49,9 @@ namespace Support_API.Controllers
         [HttpPost("Code")]
         public IActionResult VerifyCode(int Code, string Token)
         {
-            Session session = _sessionManager.VerifySession(Token, Code);
+            AuthUserResponse authResponse = _sessionManager.VerifySession(Token, Code);
 
-            return Ok();
+            return Ok(authResponse);
         }
     }
 }

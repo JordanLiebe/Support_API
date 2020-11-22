@@ -80,6 +80,7 @@ namespace Support_API.Data
             {
                 Login = login,
                 JWT = string.Empty,
+                RequireMFA = true,
                 Errors = new List<string>(),
                 Success = false
             };

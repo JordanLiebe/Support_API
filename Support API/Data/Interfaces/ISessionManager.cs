@@ -9,7 +9,7 @@ namespace Support_API.Data
     public interface ISessionManager
     {
         public Session CreateSession(User user, string JWT, string Code);
-        public Session VerifySession(string JWT, int Code);
+        public AuthUserResponse VerifySession(string JWT, int Code);
         public Session GetLatestSession(string UUID);
     }
 }

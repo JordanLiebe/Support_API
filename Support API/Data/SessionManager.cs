@@ -39,9 +39,16 @@ namespace Support_API.Data
             return session;
         }
 
-        public Session VerifySession(string JWT, int Code)
+        public AuthUserResponse VerifySession(string Token, int Code)
         {
             Session session = null;
+            AuthUserResponse authResponse = new AuthUserResponse
+            {
+                JWT = Token,
+                RequireMFA = true,
+                Errors = new List<string>(),
+                Success = false
+            };
 
             string CodeStr = Code.ToString();
             string HashedCodeStr = Hashing.GenerateHash(CodeStr);
@@ -53,11 +60,21 @@ namespace Support_API.Data
                 session = connection
                     .Query<Session>(
                         "EXEC [Support-API].[dbo].[SP_Verify_Session] @JWT = @JWT, @CODE = @CODE",
-                        new { JWT = JWT, CODE = HashedCodeStr }
+                        new { JWT = Token, CODE = HashedCodeStr }
                     ).FirstOrDefault();
             }
 
-            return session;
+            if(session.Verified)
+            {
+                authResponse.Success = true;
+                authResponse.RequireMFA = false;
+            }
+            else
+            {
+                authResponse.Errors.Add("Invalid Code or Token");
+            }
+
+            return authResponse;
         }
 
         public Session GetLatestSession(string UUID)

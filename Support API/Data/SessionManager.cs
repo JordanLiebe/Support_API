@@ -63,15 +63,22 @@ namespace Support_API.Data
                         new { JWT = Token, CODE = HashedCodeStr }
                     ).FirstOrDefault();
             }
-
-            if(session.Verified)
+            
+            if(session != null)
             {
-                authResponse.Success = true;
-                authResponse.RequireMFA = false;
+                if (session.Verified)
+                {
+                    authResponse.Success = true;
+                    authResponse.RequireMFA = false;
+                }
+                else
+                {
+                    authResponse.Errors.Add("Invalid Code");
+                }
             }
             else
             {
-                authResponse.Errors.Add("Invalid Code or Token");
+                authResponse.Errors.Add("Invalid Token");
             }
 
             return authResponse;

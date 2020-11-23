@@ -50,8 +50,7 @@ namespace Support_API.Data
                 Success = false
             };
 
-            string CodeStr = Code.ToString();
-            string HashedCodeStr = Hashing.GenerateHash(CodeStr);
+            
 
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -59,12 +58,16 @@ namespace Support_API.Data
 
                 session = connection
                     .Query<Session>(
-                        "EXEC [Support-API].[dbo].[SP_Verify_Session] @JWT = @JWT, @CODE = @CODE",
-                        new { JWT = Token, CODE = HashedCodeStr }
+                        "EXEC [Support-API].[dbo].[SP_Verify_Session] @JWT = @JWT",
+                        new { JWT = Token }
                     ).FirstOrDefault();
             }
-            
-            if(session != null)
+
+            Hash codeHash = new Hash(session.Code);
+            string CodeStr = Code.ToString();
+            string HashedCodeStr = Hashing.GenerateHash(CodeStr, codeHash.iterations, codeHash.salt);
+
+            if (session.Code == HashedCodeStr)
             {
                 if (session.Verified)
                 {

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Support_API.Data;
 using Support_API.Models.Auth;
 using Support_API.Tools;
@@ -27,10 +28,10 @@ namespace Support_API.Middleware
             _next = next;
         }
 
-        public async Task InvokeAsync(HttpContext context, IUserManager _userManager, ISessionManager _sessionManager)
+        public async Task InvokeAsync(HttpContext context, IConfiguration _configuration, IUserManager _userManager, ISessionManager _sessionManager)
         {
             IHeaderDictionary headers = context.Request.Headers;
-            string[] Unlocked = { "/Auth/Login", "/Auth/Code" };
+            string[] Unlocked = { "/Auth/Login", "/Auth/Code", "/Auth/Create" };
 
             string authHeader = headers["Authorization"];
             string path = context.Request.Path;
@@ -44,7 +45,8 @@ namespace Support_API.Middleware
                     if (tokenBreak.Length == 2)
                     {
                         string AuthToken = tokenBreak[1];
-                        string UUID = JWT.ValidateJwtToken(AuthToken);
+                        string JwtSecret = _configuration.GetValue<string>("JwtSecret");
+                        string UUID = JWT.ValidateJwtToken(AuthToken, JwtSecret);
 
                         if(UUID != null)
                         {

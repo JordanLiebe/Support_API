@@ -31,9 +31,9 @@ namespace Support_API.Controllers
         }
 
         [HttpPost("Create")]
-        public IActionResult CreateUser(string First_Name, string Middle_Name, string Last_Name, string Login, string Password)
+        public IActionResult CreateUser(CreateUserRequest Request)
         {
-            CreateUserResponse crResponse = _userManager.CreateUser(First_Name, Middle_Name, Last_Name, Login, Password);
+            CreateUserResponse crResponse = _userManager.CreateUser(Request.Login, Request.Password, Request.Email, Request.First_Name, Request.Middle_Name, Request.Last_Name);
 
             return Ok(crResponse);
         }

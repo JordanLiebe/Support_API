@@ -11,10 +11,10 @@ namespace Support_API.Tools
 {
     public static class JWT
     {
-        public static string GenerateToken(string UUID, string Login)
+        public static string GenerateToken(string UUID, string Login, string secret)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes("Super Super Secret Code... Do Not Share!!!");
+            var key = Encoding.ASCII.GetBytes(secret);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] { new Claim("UUID", UUID), new Claim("Login", Login) }),
@@ -27,10 +27,10 @@ namespace Support_API.Tools
         }
 
         #nullable enable
-        public static string? ValidateJwtToken(string token)
+        public static string? ValidateJwtToken(string token, string secret)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes("Super Super Secret Code... Do Not Share!!!");
+            var key = Encoding.ASCII.GetBytes(secret);
             try
             {
                 tokenHandler.ValidateToken(token, new TokenValidationParameters

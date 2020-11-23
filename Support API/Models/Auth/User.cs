@@ -16,6 +16,7 @@ namespace Support_API.Models.Auth
             UUID = user.UUID;
             Login = user.Login;
             Hash = IncludeHash ? user.Hash : "******";
+            Email = user.Email;
             First_Name = user.First_Name;
             Middle_Name = user.Middle_Name;
             Last_Name = user.Last_Name;
@@ -26,8 +27,9 @@ namespace Support_API.Models.Auth
         public string UUID { get; set; }
         // User Credentials for verifying Identity //
         public string Login { get; set; }
-        [IgnoreDataMember]
         public string Hash { get; set; }
+        // Email used when sending MFA Code //
+        public string Email { get; set; }
         // General User Information //
         public string First_Name { get; set; }
         public string Middle_Name { get; set; }

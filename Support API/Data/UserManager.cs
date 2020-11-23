@@ -31,7 +31,7 @@ namespace Support_API.Data
         public User CurrentUser { get; set; }
 
         // User Management Functions //
-        public CreateUserResponse CreateUser(string firstName, string middleName, string lastName, string login, string password)
+        public CreateUserResponse CreateUser(string login, string password, string email, string firstName, string middleName, string lastName)
         {
             // Generate UUID for user //
             Guid uuid = System.Guid.NewGuid();
@@ -51,8 +51,8 @@ namespace Support_API.Data
 
                 crResponse.User = connection
                     .Query<User>(
-                        "EXEC [Support-API].[dbo].[SP_Create_User] @UUID = @UUID, @Login = @Login, @Hash = @Hash, @First_Name = @First_Name, @Middle_Name = @Middle_Name, @Last_Name = @Last_Name",
-                        new { UUID = uuid.ToString(), Login = login, Hash = hash, First_Name = firstName, Middle_Name = middleName, Last_Name = lastName }
+                        "EXEC [Support-API].[dbo].[SP_Create_User] @UUID = @UUID, @Login = @Login, @Hash = @Hash, @Email = @Email, @First_Name = @First_Name, @Middle_Name = @Middle_Name, @Last_Name = @Last_Name",
+                        new { UUID = uuid.ToString(), Login = login, Hash = hash, Email = email, First_Name = firstName, Middle_Name = middleName, Last_Name = lastName }
                     ).FirstOrDefault();
 
                 if (crResponse.User != null)
@@ -63,7 +63,6 @@ namespace Support_API.Data
         }
         public async Task<AuthUserResponse> AuthenticateUser(string login, string password)
         {
-            string hash = Hashing.GenerateHash(password);
             User user = null;
 
             using (var connection = new SqlConnection(_connectionString))
@@ -76,6 +75,9 @@ namespace Support_API.Data
                         new { Login = login }
                     ).FirstOrDefault();
             }
+
+            Hash currentHash = new Hash(user.Hash);
+            string hash = Hashing.GenerateHash(password, currentHash.iterations, currentHash.salt);
 
             AuthUserResponse loginResponse = new AuthUserResponse
             {
@@ -92,9 +94,10 @@ namespace Support_API.Data
             }
             else
             {
-                var token = JWT.GenerateToken(user.UUID, user.Login);
+                string JwtSecret = _configuration.GetValue<string>("JwtSecret");
+                var token = JWT.GenerateToken(user.UUID, user.Login, JwtSecret);
 
-                int code = NumberGen.Random(111111, 999999);
+                int code = Generator.RandomNum(111111, 999999);
                 string hashedCode = Hashing.GenerateHash(code.ToString());
 
                 string emailApiKey = _configuration.GetValue<string>("MailApiKey");
@@ -102,8 +105,8 @@ namespace Support_API.Data
                 {
                     From_Email = "webmaster@jmliebe.com",
                     From_Name = "Support App",
-                    To_Email = "Jordan.Liebe@jmliebe.com",
-                    To_Name = "Jordan",
+                    To_Email = user.Email,
+                    To_Name = $"{user.First_Name} {user.Middle_Name} {user.Last_Name}",
                     Subject = "Verification Email",
                     Content_Html = $"<div>Your verification code is: {code}</div>",
                     Content_Plain = $"Your verification code is: {code}"

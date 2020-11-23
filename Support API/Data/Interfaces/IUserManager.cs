@@ -14,7 +14,7 @@ namespace Support_API.Data
 
         // User Management Functions //
         public CreateUserResponse CreateUser(string firstName, string middleName, string lastName, string login, string password);
-        public AuthUserResponse AuthenticateUser(string login, string password);
+        public Task<AuthUserResponse> AuthenticateUser(string login, string password);
         public User GetUser(string uuid);
     }
 }

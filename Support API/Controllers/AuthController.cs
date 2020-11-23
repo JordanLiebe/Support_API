@@ -39,9 +39,9 @@ namespace Support_API.Controllers
         }
 
         [HttpPost("Login")]
-        public IActionResult LoginUser([FromBody]LoginPost login)
+        public async Task<IActionResult> LoginUser([FromBody]LoginPost login)
         {
-            AuthUserResponse authResponse = _userManager.AuthenticateUser(login.Username, login.Password);
+            AuthUserResponse authResponse = await _userManager.AuthenticateUser(login.Username, login.Password);
 
             return Ok(authResponse);
         }

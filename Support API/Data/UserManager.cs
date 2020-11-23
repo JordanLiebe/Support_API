@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
+using Support_API.Models;
 using Support_API.Models.Auth;
 using Support_API.Tools;
 using System;
@@ -60,7 +61,7 @@ namespace Support_API.Data
                 return crResponse;
             }
         }
-        public AuthUserResponse AuthenticateUser(string login, string password)
+        public async Task<AuthUserResponse> AuthenticateUser(string login, string password)
         {
             string hash = Hashing.GenerateHash(password);
             User user = null;
@@ -95,6 +96,19 @@ namespace Support_API.Data
 
                 int code = NumberGen.Random(111111, 999999);
                 string hashedCode = Hashing.GenerateHash(code.ToString());
+
+                string emailApiKey = _configuration.GetValue<string>("MailApiKey");
+                SingleEmailPost email = new SingleEmailPost
+                {
+                    From_Email = "webmaster@jmliebe.com",
+                    From_Name = "Support App",
+                    To_Email = "Jordan.Liebe@jmliebe.com",
+                    To_Name = "Jordan",
+                    Subject = "Verification Email",
+                    Content_Html = $"<div>Your verification code is: {code}</div>",
+                    Content_Plain = $"Your verification code is: {code}"
+                };
+                await Email.SingleEmail(email, emailApiKey);
 
                 Session session = _sessionManager.CreateSession(user, token, hashedCode);
 

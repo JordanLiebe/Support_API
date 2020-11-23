@@ -76,9 +76,6 @@ namespace Support_API.Data
                     ).FirstOrDefault();
             }
 
-            Hash currentHash = new Hash(user.Hash);
-            string hash = Hashing.GenerateHash(password, currentHash.iterations, currentHash.salt);
-
             AuthUserResponse loginResponse = new AuthUserResponse
             {
                 Login = login,
@@ -88,41 +85,51 @@ namespace Support_API.Data
                 Success = false
             };
 
-            if (user == null || user.Hash != hash)
+            if (user == null)
             {
                 loginResponse.Errors.Add("Invalid Username or Password");
             }
             else
             {
-                string JwtSecret = _configuration.GetValue<string>("JwtSecret");
-                var token = JWT.GenerateToken(user.UUID, user.Login, JwtSecret);
+                Hash currentHash = new Hash(user.Hash);
+                string hash = Hashing.GenerateHash(password, currentHash.iterations, currentHash.salt);
 
-                int code = Generator.RandomNum(111111, 999999);
-                string hashedCode = Hashing.GenerateHash(code.ToString());
-
-                string emailApiKey = _configuration.GetValue<string>("MailApiKey");
-                SingleEmailPost email = new SingleEmailPost
+                if(hash == user.Hash)
                 {
-                    From_Email = "webmaster@jmliebe.com",
-                    From_Name = "Support App",
-                    To_Email = user.Email,
-                    To_Name = $"{user.First_Name} {user.Middle_Name} {user.Last_Name}",
-                    Subject = "Verification Email",
-                    Content_Html = $"<div>Your verification code is: {code}</div>",
-                    Content_Plain = $"Your verification code is: {code}"
-                };
-                await Email.SingleEmail(email, emailApiKey);
+                    string JwtSecret = _configuration.GetValue<string>("JwtSecret");
+                    var token = JWT.GenerateToken(user.UUID, user.Login, JwtSecret);
 
-                Session session = _sessionManager.CreateSession(user, token, hashedCode);
+                    int code = Generator.RandomNum(111111, 999999);
+                    string hashedCode = Hashing.GenerateHash(code.ToString());
 
-                if(token == null || session == null)
-                {
-                    loginResponse.Errors.Add("Authentication Error, please contact Administrator.");
+                    string emailApiKey = _configuration.GetValue<string>("MailApiKey");
+                    SingleEmailPost email = new SingleEmailPost
+                    {
+                        From_Email = "webmaster@jmliebe.com",
+                        From_Name = "Support App",
+                        To_Email = user.Email,
+                        To_Name = $"{user.First_Name} {user.Middle_Name} {user.Last_Name}",
+                        Subject = "Verification Email",
+                        Content_Html = $"<div>Your verification code is: {code}</div>",
+                        Content_Plain = $"Your verification code is: {code}"
+                    };
+                    await Email.SingleEmail(email, emailApiKey);
+
+                    Session session = _sessionManager.CreateSession(user, token, hashedCode);
+
+                    if (token == null || session == null)
+                    {
+                        loginResponse.Errors.Add("Authentication Error, please contact Administrator.");
+                    }
+                    else
+                    {
+                        loginResponse.Success = true;
+                        loginResponse.JWT = token;
+                    }
                 }
                 else
                 {
-                    loginResponse.Success = true;
-                    loginResponse.JWT = token;
+                    loginResponse.Errors.Add("Invalid Username or Password");
                 }
             }
 

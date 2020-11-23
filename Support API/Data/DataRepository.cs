@@ -14,10 +14,12 @@ namespace Support_API.Data
         // Globals and Constructors //
         private readonly IConfiguration _configuration;
         private readonly string _connectionString;
-        public DataRepository(IConfiguration configuration)
+        private readonly IUserManager _userManager;
+        public DataRepository(IConfiguration configuration, IUserManager userManager)
         {
             _configuration = configuration;
             _connectionString = configuration.GetConnectionString("DefaultConnection");
+            _userManager = userManager;
         }
 
         // Issue Related Functions //
@@ -62,7 +64,7 @@ namespace Support_API.Data
                 return connection
                     .Query<IssueGetResponse>(
                         "EXEC [Support-API].[dbo].[SP_Create_Issue] @Subject = @Subject, @Priority = @Priority, @Category = @Category, @Department = @Department, @Initial_Note = @Initial_Note, @Author = @Author, @Status = @Status",
-                        new { Subject = Issue.Subject, Priority = Issue.Priority, Category = Issue.Category, Department = Issue.Department, Initial_Note = Issue.Initial_Note, Author = Issue.Author, Status = Issue.Status }
+                        new { Subject = Issue.Subject, Priority = Issue.Priority, Category = Issue.Category, Department = Issue.Department, Initial_Note = Issue.Initial_Note, Author = _userManager.CurrentUser.UUID, Status = "NEW" }
                     ).FirstOrDefault();
             }
         }

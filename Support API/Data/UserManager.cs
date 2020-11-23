@@ -102,6 +102,17 @@ namespace Support_API.Data
                     int code = Generator.RandomNum(111111, 999999);
                     string hashedCode = Hashing.GenerateHash(code.ToString());
 
+                    string emailPlainTemplate = "Hello {0} {1} {2}! Your Verification Code is: {3}";
+                    string emailHtmlTemplate = "<html>" +
+                        "<body>" +
+                        "<div>" +
+                        "<h2>Support App</h3>" +
+                        "<div>Hello {0} {1} {2}!</div>" +
+                        "<div>Your Verification Code is: {3}</div>" +
+                        "</div>" +
+                        "</body>" +
+                        "</html>";
+
                     string emailApiKey = _configuration.GetValue<string>("MailApiKey");
                     SingleEmailPost email = new SingleEmailPost
                     {
@@ -110,8 +121,8 @@ namespace Support_API.Data
                         To_Email = user.Email,
                         To_Name = $"{user.First_Name} {user.Middle_Name} {user.Last_Name}",
                         Subject = "Verification Email",
-                        Content_Html = $"<div>Your verification code is: {code}</div>",
-                        Content_Plain = $"Your verification code is: {code}"
+                        Content_Html = string.Format(emailHtmlTemplate, user.First_Name, user.Middle_Name, user.Last_Name, code),
+                        Content_Plain = string.Format(emailPlainTemplate, user.First_Name, user.Middle_Name, user.Last_Name, code),
                     };
                     await Email.SingleEmail(email, emailApiKey);
 

@@ -30,7 +30,7 @@ namespace Support_API.Controllers
             return Ok(user);
         }
 
-        [HttpPost("Create")]
+        [HttpPost("Register")]
         public IActionResult CreateUser(CreateUserRequest Request)
         {
             CreateUserResponse crResponse = _userManager.CreateUser(Request.Login, Request.Password, Request.Email, Request.First_Name, Request.Middle_Name, Request.Last_Name);

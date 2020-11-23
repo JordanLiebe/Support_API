@@ -31,7 +31,7 @@ namespace Support_API.Middleware
         public async Task InvokeAsync(HttpContext context, IConfiguration _configuration, IUserManager _userManager, ISessionManager _sessionManager)
         {
             IHeaderDictionary headers = context.Request.Headers;
-            string[] Unlocked = { "/Auth/Login", "/Auth/Code", "/Auth/Create" };
+            string[] Unlocked = { "/Auth/Login", "/Auth/Code", "/Auth/Register" };
 
             string authHeader = headers["Authorization"];
             string path = context.Request.Path;

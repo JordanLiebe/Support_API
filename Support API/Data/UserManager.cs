@@ -61,7 +61,7 @@ namespace Support_API.Data
                 return crResponse;
             }
         }
-        public async Task<AuthUserResponse> AuthenticateUser(string login, string password)
+        public async Task<LoginResponse> AuthenticateUser(string login, string password)
         {
             User user = null;
 
@@ -76,18 +76,16 @@ namespace Support_API.Data
                     ).FirstOrDefault();
             }
 
-            AuthUserResponse loginResponse = new AuthUserResponse
+            LoginResponse response = new LoginResponse
             {
-                Login = login,
-                JWT = string.Empty,
-                RequireMFA = true,
+                Success = false,
                 Errors = new List<string>(),
-                Success = false
+                JWT = string.Empty,
             };
 
             if (user == null)
             {
-                loginResponse.Errors.Add("Invalid Username or Password");
+                response.Errors.Add("Invalid Username or Password");
             }
             else
             {
@@ -130,21 +128,21 @@ namespace Support_API.Data
 
                     if (token == null || session == null)
                     {
-                        loginResponse.Errors.Add("Authentication Error, please contact Administrator.");
+                        response.Errors.Add("Authentication Error, please contact Administrator.");
                     }
                     else
                     {
-                        loginResponse.Success = true;
-                        loginResponse.JWT = token;
+                        response.Success = true;
+                        response.JWT = token;
                     }
                 }
                 else
                 {
-                    loginResponse.Errors.Add("Invalid Username or Password");
+                    response.Errors.Add("Invalid Username or Password");
                 }
             }
 
-            return loginResponse;
+            return response;
         }
         public User GetUser(string uuid)
         {

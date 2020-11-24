@@ -41,17 +41,17 @@ namespace Support_API.Controllers
         [HttpPost("Login")]
         public async Task<IActionResult> LoginUser([FromBody]LoginPost login)
         {
-            AuthUserResponse authResponse = await _userManager.AuthenticateUser(login.Username, login.Password);
+            LoginResponse response = await _userManager.AuthenticateUser(login.Username, login.Password);
 
-            return Ok(authResponse);
+            return Ok(response);
         }
 
         [HttpPost("Code")]
         public IActionResult VerifyCode([FromBody]CodePost post)
         {
-            AuthUserResponse authResponse = _sessionManager.VerifySession(post.Token, post.Code);
+            CodeResponse response = _sessionManager.VerifySession(post.Token, post.Code);
 
-            return Ok(authResponse);
+            return Ok(response);
         }
     }
 }

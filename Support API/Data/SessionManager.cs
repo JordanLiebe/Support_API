@@ -39,18 +39,14 @@ namespace Support_API.Data
             return session;
         }
 
-        public AuthUserResponse VerifySession(string Token, int Code)
+        public CodeResponse VerifySession(string Token, int Code)
         {
             Session session = null;
-            AuthUserResponse authResponse = new AuthUserResponse
+            CodeResponse response = new CodeResponse
             {
-                JWT = Token,
-                RequireMFA = true,
+                Success = false,
                 Errors = new List<string>(),
-                Success = false
             };
-
-            
 
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -71,20 +67,19 @@ namespace Support_API.Data
             {
                 if (session.Verified)
                 {
-                    authResponse.Success = true;
-                    authResponse.RequireMFA = false;
+                    response.Success = true;
                 }
                 else
                 {
-                    authResponse.Errors.Add("Invalid Code");
+                    response.Errors.Add("Invalid Code");
                 }
             }
             else
             {
-                authResponse.Errors.Add("Invalid Token");
+                response.Errors.Add("Invalid Token");
             }
 
-            return authResponse;
+            return response;
         }
 
         public Session GetLatestSession(string UUID)

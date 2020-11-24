@@ -14,16 +14,18 @@ namespace Support_API.Controllers
     [ApiController]
     public class IssueController : ControllerBase
     {
-        public readonly IDataRepository myDataRepository;
-        public IssueController(IDataRepository dataRepository)
+        public readonly IDataRepository _dataRepository;
+        private readonly IUserManager _userManager;
+        public IssueController(IDataRepository dataRepository, IUserManager userManager)
         {
-            myDataRepository = dataRepository;
+            _dataRepository = dataRepository;
         }
 
         [HttpGet]
         public IActionResult GetIssues([FromQuery]IssueGetFilters Filters)
         {
-            List<IssueGetResponse> Data = myDataRepository.GetIssues(Filters);
+            Filters.Author = _userManager.CurrentUser.UUID;
+            List<IssueGetResponse> Data = _dataRepository.GetIssues(Filters);
 
             return Ok(Data);
         }
@@ -31,7 +33,7 @@ namespace Support_API.Controllers
         [HttpGet("{Id}")]
         public IActionResult GetIssue(int Id)
         {
-            IssueGetResponse Issue = myDataRepository.GetIssue(Id);
+            IssueGetResponse Issue = _dataRepository.GetIssue(Id);
 
             return Ok(Issue);
         }
@@ -39,7 +41,7 @@ namespace Support_API.Controllers
         [HttpPut("{Id}")]
         public IActionResult UpdateIssue(int Id, [FromBody]IssuePostRequest Issue)
         {
-            IssueGetResponse updatedIssue = myDataRepository.UpdateIssue(Id, Issue);
+            IssueGetResponse updatedIssue = _dataRepository.UpdateIssue(Id, Issue);
 
             if (updatedIssue != null)
                 return Ok(updatedIssue);
@@ -50,7 +52,7 @@ namespace Support_API.Controllers
         [HttpPost]
         public IActionResult CreateIssue(IssuePostRequest Issue)
         {
-            IssueGetResponse CreatedIssue = myDataRepository.CreateIssue(Issue);
+            IssueGetResponse CreatedIssue = _dataRepository.CreateIssue(Issue);
 
             return Ok(CreatedIssue);
         }
@@ -58,7 +60,7 @@ namespace Support_API.Controllers
         [HttpDelete("{Id}")]
         public IActionResult DeleteIssue(int Id)
         {
-            bool deleted = myDataRepository.DeleteIssue(Id);
+            bool deleted = _dataRepository.DeleteIssue(Id);
 
             return Ok(deleted ? true : false);
         }
@@ -66,7 +68,7 @@ namespace Support_API.Controllers
         [HttpGet("{IssueId}/Notes")]
         public IActionResult GetIssueNotes(int IssueId)
         {
-            List<NoteGetResponse> response = myDataRepository.GetIssueNotes(IssueId);
+            List<NoteGetResponse> response = _dataRepository.GetIssueNotes(IssueId);
 
             return Ok(response);
         }

@@ -19,6 +19,7 @@ namespace Support_API.Controllers
         public IssueController(IDataRepository dataRepository, IUserManager userManager)
         {
             _dataRepository = dataRepository;
+            _userManager = userManager;
         }
 
         [HttpGet]

@@ -56,7 +56,7 @@ namespace Support_API.Middleware
                             {
                                 Session latestSession = _sessionManager.GetLatestSession(UUID);
 
-                                if(latestSession.JWT == AuthToken && latestSession.UUID == UUID)
+                                if(latestSession.JWT == AuthToken && latestSession.UUID == UUID && latestSession.Verified)
                                 {
                                     _userManager.CurrentUser = user;
                                     await _next(context);

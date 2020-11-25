@@ -31,44 +31,30 @@ namespace Support_API.Middleware
         public async Task InvokeAsync(HttpContext context, IConfiguration _configuration, IUserManager _userManager, ISessionManager _sessionManager)
         {
             IHeaderDictionary headers = context.Request.Headers;
-            string[] Unlocked = { "/Auth/Login", "/Auth/Code", "/Auth/Register" };
-
             string authHeader = headers["Authorization"];
-            string path = context.Request.Path;
 
-            if (Unlocked.Where(e => e == path).FirstOrDefault() == null)
+            if (authHeader != null && authHeader != string.Empty)
             {
-                if (authHeader != null && authHeader != string.Empty)
+                string[] tokenBreak = authHeader.Split(" ");
+
+                if (tokenBreak.Length == 2)
                 {
-                    string[] tokenBreak = authHeader.Split(" ");
+                    string AuthToken = tokenBreak[1];
+                    string JwtSecret = _configuration.GetValue<string>("JwtSecret");
+                    string UUID = JWT.ValidateJwtToken(AuthToken, JwtSecret);
 
-                    if (tokenBreak.Length == 2)
+                    if(UUID != null)
                     {
-                        string AuthToken = tokenBreak[1];
-                        string JwtSecret = _configuration.GetValue<string>("JwtSecret");
-                        string UUID = JWT.ValidateJwtToken(AuthToken, JwtSecret);
+                        User user = _userManager.GetUser(UUID);
 
-                        if(UUID != null)
+                        Session latestSession = _sessionManager.GetLatestSession(UUID);
+
+                        if (user != null && latestSession.JWT == AuthToken && latestSession.UUID == UUID && latestSession.Verified)
                         {
-                            User user = _userManager.GetUser(UUID);
-
-                            if(user != null)
-                            {
-                                Session latestSession = _sessionManager.GetLatestSession(UUID);
-
-                                if(latestSession.JWT == AuthToken && latestSession.UUID == UUID && latestSession.Verified)
-                                {
-                                    _userManager.CurrentUser = user;
-                                    await _next(context);
-                                    return;
-                                }
-                            }
+                            _userManager.CurrentUser = user;
                         }
                     }
                 }
-
-                context.Response.StatusCode = 401;
-                return;
             }
 
             await _next(context);

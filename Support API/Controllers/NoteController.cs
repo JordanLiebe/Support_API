@@ -14,23 +14,31 @@ namespace Support_API.Controllers
     [ApiController]
     public class NoteController : ControllerBase
     {
-        public readonly IDataRepository myDataRepository;
-        public NoteController(IDataRepository dataRepository)
+        private readonly IDataRepository _dataRepository;
+        private readonly IUserManager _userManager;
+        public NoteController(IDataRepository dataRepository, IUserManager userManager)
         {
-            myDataRepository = dataRepository;
+            _dataRepository = dataRepository;
+            _userManager = userManager;
         }
 
         [HttpGet]
         public IActionResult GetNotes()
         {
-            List<NoteGetResponse> notes = myDataRepository.GetNotes();
+            if (_userManager.CurrentUser == null)
+                return Unauthorized();
+
+            List<NoteGetResponse> notes = _dataRepository.GetNotes();
             return Ok(notes);
         }
 
         [HttpGet("{Id}")]
         public IActionResult GetNotes(int Id)
         {
-            NoteGetResponse note = myDataRepository.GetNote(Id);
+            if (_userManager.CurrentUser == null)
+                return Unauthorized();
+
+            NoteGetResponse note = _dataRepository.GetNote(Id);
 
             if (note != null)
                 return Ok(note);
@@ -41,7 +49,10 @@ namespace Support_API.Controllers
         [HttpPost]
         public IActionResult CreateNote(NotePostRequest note)
         {
-            NoteGetResponse newNote = myDataRepository.CreateNote(note);
+            if (_userManager.CurrentUser == null)
+                return Unauthorized();
+
+            NoteGetResponse newNote = _dataRepository.CreateNote(note);
 
             return Ok(newNote);
         }
@@ -49,7 +60,10 @@ namespace Support_API.Controllers
         [HttpPut("{Id}")]
         public IActionResult UpdateNote(int Id, [FromBody]NotePostRequest note)
         {
-            NoteGetResponse updatedNote = myDataRepository.UpdateNote(Id, note);
+            if (_userManager.CurrentUser == null)
+                return Unauthorized();
+
+            NoteGetResponse updatedNote = _dataRepository.UpdateNote(Id, note);
 
             if (updatedNote != null)
                 return Ok(updatedNote);
@@ -60,7 +74,10 @@ namespace Support_API.Controllers
         [HttpDelete("{Id}")]
         public IActionResult DeleteNote(int Id)
         {
-            bool success = myDataRepository.DeleteNote(Id);
+            if (_userManager.CurrentUser == null)
+                return Unauthorized();
+
+            bool success = _dataRepository.DeleteNote(Id);
 
             return Ok(new { Id = Id, Success = success });
         }

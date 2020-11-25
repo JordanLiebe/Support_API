@@ -25,6 +25,9 @@ namespace Support_API.Controllers
         [HttpGet("Me")]
         public IActionResult GetMe()
         {
+            if (_userManager.CurrentUser == null)
+                return Unauthorized();
+
             User user = new User(_userManager.CurrentUser, false);
 
             return Ok(user);

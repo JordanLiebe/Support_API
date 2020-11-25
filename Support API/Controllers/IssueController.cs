@@ -25,6 +25,9 @@ namespace Support_API.Controllers
         [HttpGet]
         public IActionResult GetIssues([FromQuery]IssueGetFilters Filters)
         {
+            if (_userManager.CurrentUser == null)
+                return Unauthorized();
+
             Filters.Author = _userManager.CurrentUser.UUID;
             List<IssueGetResponse> Data = _dataRepository.GetIssues(Filters);
 
@@ -34,6 +37,9 @@ namespace Support_API.Controllers
         [HttpGet("{Id}")]
         public IActionResult GetIssue(int Id)
         {
+            if (_userManager.CurrentUser == null)
+                return Unauthorized();
+
             IssueGetResponse Issue = _dataRepository.GetIssue(Id);
 
             return Ok(Issue);
@@ -42,6 +48,9 @@ namespace Support_API.Controllers
         [HttpPut("{Id}")]
         public IActionResult UpdateIssue(int Id, [FromBody]IssuePostRequest Issue)
         {
+            if (_userManager.CurrentUser == null)
+                return Unauthorized();
+
             IssueGetResponse updatedIssue = _dataRepository.UpdateIssue(Id, Issue);
 
             if (updatedIssue != null)
@@ -53,6 +62,9 @@ namespace Support_API.Controllers
         [HttpPost]
         public IActionResult CreateIssue(IssuePostRequest Issue)
         {
+            if (_userManager.CurrentUser == null)
+                return Unauthorized();
+
             IssueGetResponse CreatedIssue = _dataRepository.CreateIssue(Issue);
 
             return Ok(CreatedIssue);
@@ -61,6 +73,9 @@ namespace Support_API.Controllers
         [HttpDelete("{Id}")]
         public IActionResult DeleteIssue(int Id)
         {
+            if (_userManager.CurrentUser == null)
+                return Unauthorized();
+
             bool deleted = _dataRepository.DeleteIssue(Id);
 
             return Ok(deleted ? true : false);
@@ -69,6 +84,9 @@ namespace Support_API.Controllers
         [HttpGet("{IssueId}/Notes")]
         public IActionResult GetIssueNotes(int IssueId)
         {
+            if (_userManager.CurrentUser == null)
+                return Unauthorized();
+
             List<NoteGetResponse> response = _dataRepository.GetIssueNotes(IssueId);
 
             return Ok(response);

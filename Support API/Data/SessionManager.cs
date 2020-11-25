@@ -54,7 +54,7 @@ namespace Support_API.Data
 
                 session = connection
                     .Query<Session>(
-                        "EXEC [Support-API].[dbo].[SP_Verify_Session] @JWT = @JWT",
+                        "EXEC [Support-API].[dbo].[SP_Get_Session] @JWT = @JWT",
                         new { JWT = Token }
                     ).FirstOrDefault();
             }
@@ -65,6 +65,17 @@ namespace Support_API.Data
 
             if (session.Code == HashedCodeStr)
             {
+                using (var connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+
+                    session = connection
+                        .Query<Session>(
+                            "EXEC [Support-API].[dbo].[SP_Verify_Session] @JWT = @JWT",
+                            new { JWT = Token }
+                        ).FirstOrDefault();
+                }
+
                 if (session.Verified)
                 {
                     response.Success = true;

@@ -22,5 +22,8 @@ namespace Support_API.Data
         public NoteGetResponse GetNote(int Id);//
         public NoteGetResponse UpdateNote(int Id, NotePostRequest Note);//
         public bool DeleteNote(int Id);//
+
+        // Stat Related Functions //
+        public List<GlobalStat> GetGlobalStats();
     }
 }

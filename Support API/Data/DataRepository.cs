@@ -212,5 +212,20 @@ namespace Support_API.Data
                 return deleted.Success == 1 ? true : false;
             }
         }
+
+        // Stat Related Functions //
+        public List<GlobalStat> GetGlobalStats()
+        {
+            List<GlobalStat> stats = null;
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+
+                stats = connection.Query<GlobalStat>("EXEC [dbo].[SP_Stats_Global]").ToList();
+            }
+
+            return stats;
+        }
     }
 }

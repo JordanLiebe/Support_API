@@ -12,7 +12,7 @@ namespace Support_API.Data
         public List<IssueGetResponse> GetIssues(IssueGetFilters Filters);//SP_Get_Issues_And_Notes_Filter
         public IssueGetResponse CreateIssue(IssuePostRequest Issue);//SP_Create_Issue
         public IssueGetResponse GetIssue(int Id);//SP_Get_Issue
-        public IssueGetResponse UpdateIssue(int Id, IssuePostRequest Issue);//SP_Update_Issue
+        public IssueGetResponse UpdateIssue(int Id, IssuePutRequest Issue);//SP_Update_Issue
         public bool DeleteIssue(int Id);//SP_Delete_Issue
         public List<NoteGetResponse> GetIssueNotes(int IssueId);
 

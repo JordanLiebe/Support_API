@@ -62,10 +62,12 @@ namespace Support_API.Data
             {
                 connection.Open();
 
+                User author = _userManager.CurrentUser;
+
                 return connection
                     .Query<IssueGetResponse>(
                         "EXEC [Support-API].[dbo].[SP_Create_Issue] @Subject = @Subject, @Priority = @Priority, @Category = @Category, @Department = @Department, @Initial_Note = @Initial_Note, @Author = @Author, @Status = @Status",
-                        new { Subject = Issue.Subject, Priority = Issue.Priority, Category = Issue.Category, Department = Issue.Department, Initial_Note = Issue.Initial_Note, Author = _userManager.CurrentUser.UUID, Status = "NEW" }
+                        new { Subject = Issue.Subject, Priority = Issue.Priority, Category = Issue.Category, Department = Issue.Department, Initial_Note = Issue.Initial_Note, Author = author.UUID, Status = "NEW" }
                     ).FirstOrDefault();
             }
         }
@@ -101,16 +103,18 @@ namespace Support_API.Data
                 .FirstOrDefault();
             }
         }
-        public IssueGetResponse UpdateIssue(int Id, IssuePostRequest Issue)
+        public IssueGetResponse UpdateIssue(int Id, IssuePutRequest Issue)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
 
+                User author = _userManager.CurrentUser;
+
                 return connection
                     .Query<IssueGetResponse>(
                         "EXEC [Support-API].[dbo].[SP_Update_Issue] @Id = @Id, @Subject = @Subject, @Priority = @Priority, @Category = @Category, @Department = @Department, @Author = @Author, @Status = @Status",
-                        new { Id = Id, Subject = Issue.Subject, Priority = Issue.Priority, Category = Issue.Category, Department = Issue.Department, Author = Issue.Author, Status = Issue.Status }
+                        new { Id = Id, Subject = Issue.Subject, Priority = Issue.Priority, Category = Issue.Category, Department = Issue.Department, Author = author.UUID, Status = Issue.Status }
                     ).FirstOrDefault();
             }
         }

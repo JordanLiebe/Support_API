@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Support_API.Models
 {
-    public class IssuePostRequest
+    public class IssuePutRequest
     {
         [MaxLength(300)]
         public string Subject { get; set; }
@@ -16,8 +16,6 @@ namespace Support_API.Models
         public string Category { get; set; }
         [MaxLength(100)]
         public string Department { get; set; }
-        [MaxLength(150)]
-        public string Initial_Note { get; set; }
         [MaxLength(100)]
         public string Status { get; set; }
     }

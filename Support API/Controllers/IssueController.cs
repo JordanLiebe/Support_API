@@ -46,7 +46,7 @@ namespace Support_API.Controllers
         }
 
         [HttpPut("{Id}")]
-        public IActionResult UpdateIssue(int Id, [FromBody]IssuePostRequest Issue)
+        public IActionResult UpdateIssue(int Id, [FromBody]IssuePutRequest Issue)
         {
             if (_userManager.CurrentUser == null)
                 return Unauthorized();

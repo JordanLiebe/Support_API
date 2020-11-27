@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
 using Support_API.Models;
+using Support_API.Models.Auth;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -162,11 +163,13 @@ namespace Support_API.Data
             using (var connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
+
+                User author = _userManager.CurrentUser;
                  
                 return connection
                     .Query<NoteGetResponse>(
                         "EXEC [Support-API].[dbo].[SP_Create_Note] @IssueId = @IssueId, @Content = @Content, @Flag = @Flag, @Author = @Author",
-                        new { IssueId = Note.IssueId, Content = Note.Content, Flag = Note.Flag, Author = Note.Author }
+                        new { IssueId = Note.IssueId, Content = Note.Content, Flag = Note.Flag, Author = author.UUID }
                     ).FirstOrDefault();
             }
         }
@@ -189,9 +192,11 @@ namespace Support_API.Data
             {
                 connection.Open();
 
+                User author = _userManager.CurrentUser;
+
                 return connection
                     .Query<NoteGetResponse>(
-                        "EXEC [dbo].[SP_Update_Note] @Id = @Id, @IssueId = @IssueId, @Content = @Content, @Flag = @Flag, @Author = @Author", new { Id = Id, IssueId = Note.IssueId, Content = Note.Content, Flag = Note.Flag, Author = Note.Author })
+                        "EXEC [dbo].[SP_Update_Note] @Id = @Id, @IssueId = @IssueId, @Content = @Content, @Flag = @Flag, @Author = @Author", new { Id = Id, IssueId = Note.IssueId, Content = Note.Content, Flag = Note.Flag, Author = author.UUID })
                     .Distinct()
                     .FirstOrDefault();
             }
